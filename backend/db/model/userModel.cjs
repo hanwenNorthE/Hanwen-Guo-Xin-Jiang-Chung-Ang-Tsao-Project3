@@ -1,8 +1,7 @@
 const userModel = require('../schema/user.cjs')
 const { validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
-
-
+const bcrypt = require('bcryptjs'); 
+const { session } = require('express-session');
 
 // signup
 const signup = async (req, res) => { 
@@ -37,13 +36,14 @@ const signup = async (req, res) => {
     password:encryptedPassword
   }) 
   
-  console.log(newUser);
   try {
     await newUser.save();
   } catch (error) {
     console.log(errors.message)
     return res.status(400).json({ error: "Sign up failed" });
   }
+
+  req.session.userID = newUser._id;
 
   res.json(newUser);
 }
@@ -53,7 +53,7 @@ const signup = async (req, res) => {
 const login = async (req, res) => { 
   const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors:'Input is invalid, username  or password is empty'});
+      return res.status(400).json({ errors:'Input is invalid, username or password is empty'});
     } 
 
     const { username, password } = req.body;
@@ -79,6 +79,7 @@ const login = async (req, res) => {
         return res.status(400).json({ error: "Password not match" });
     }
 
+    req.session.userID = user._id; 
     res.json(user);
 }
 
@@ -158,14 +159,29 @@ const addMutualFriendship  = async (req, res) => {
     console.error('Error adding friend:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-
 };
-  
+
+//logout 
+const logout = async (req, res) => {
+  try {
+      req.session.destroy((err) => {
+          if (err) {
+              res.status(500).send('Logout clear session failed');
+          } else {
+              res.send('Logout Succ');
+          }
+      });
+  } catch (error) {
+      res.status(500).send('Logout failed');
+  }
+};
+
 module.exports = {signup
                   ,login
                   ,getUser 
                   ,addMutualFriendship 
                   ,updatePw
+                  ,logout
                   };
 
 
