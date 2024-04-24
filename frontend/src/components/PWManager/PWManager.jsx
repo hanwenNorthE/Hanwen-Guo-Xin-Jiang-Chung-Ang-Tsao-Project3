@@ -23,9 +23,9 @@ function PWManager() {
         { id: 3, name: 'Service/Domain 3', username: 'username 3', password: 'password 3' }
     ];
 
-    // const filteredPasswords = passwords.filter(password =>
-    //     password.name.toLowerCase().includes(searchTerm.toLowerCase())
-    // );
+    const filteredPasswords = passwords.filter(password =>
+        password.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="pwmanager">
