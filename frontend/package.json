@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "passwordmanager",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "axios": "^1.6.8",
+    "framer-motion": "^11.1.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
