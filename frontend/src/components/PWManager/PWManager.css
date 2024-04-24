@@ -3,6 +3,27 @@
     padding: 20px;
 }
 
+
+.search-box {
+    display: block;
+    width: 20%; 
+    margin: 20px auto; 
+    padding: 8px; 
+    font-size: 16px; 
+}
+
+.copy-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.copy-button img {
+    width: 24px;
+    height: 24px;
+}
+
+
 .cards-container {
     display: flex;
     flex-wrap: wrap;
@@ -35,4 +56,9 @@
 
 .card:hover {
     box-shadow: 0px 0px 30px 1px #FDF0D5;
+}
+
+.copy-button img {
+    width: 20px; 
+    height: 20px;
 }
