@@ -23,16 +23,16 @@ function PWManager() {
         { id: 3, name: 'Service/Domain 3', username: 'username 3', password: 'password 3' }
     ];
 
-    const filteredPasswords = passwords.filter(password =>
-        password.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // const filteredPasswords = passwords.filter(password =>
+    //     password.name.toLowerCase().includes(searchTerm.toLowerCase())
+    // );
 
     return (
         <div className="pwmanager">
             <h1>View and update your passwords.</h1>
             <input
                 type="text"
-                placeholder="Search passwords by service/domain"
+                placeholder="Search by service"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 className="search-box"
@@ -51,7 +51,7 @@ function PWManager() {
                                 <img src="/copy-svgrepo-com.svg" alt="Copy" />
                             </button>
                         </div>
-                        <button onClick={() => sharePassword(password.details)} className="bot-button">  {/* Assuming sharePassword function is implemented elsewhere */}
+                        <button onClick={() => sharePassword(password.details)} className="bot-button"> 
                             <img src="/share-1-svgrepo-com.svg" alt="Share" />
                         </button>
                     </div>
