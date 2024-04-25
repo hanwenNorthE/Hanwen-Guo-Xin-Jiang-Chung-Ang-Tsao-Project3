@@ -22,9 +22,9 @@ function PWManager() {
 
     // need change, add logic
     const passwords = [
-        { id: 1, name: 'Service/Domain 1', username: 'username 1', password: 'password 1' },
-        { id: 2, name: 'Service/Domain 2', username: 'username 2', password: 'password 2' },
-        { id: 3, name: 'Service/Domain 3', username: 'username 3', password: 'password 3' }
+        { id: 1, name: 'Service/Domain 1', password: 'password 1' },
+        { id: 2, name: 'Service/Domain 2', password: 'password 2' },
+        { id: 3, name: 'Service/Domain 3', password: 'password 3' }
     ];
 
     const filteredPasswords = passwords.filter(password =>
@@ -66,21 +66,42 @@ function PWManager() {
                 {filteredPasswords.map(password => (
                     <div key={password.id} className="card">
                         <h2>{password.name}</h2>
-                        <p>{password.username}</p>
                         <div className="password-container">
                             <p>{visiblePasswords[password.id] ? password.password : '••••••••'}</p>
-                            <button onClick={() => togglePasswordVisibility(password.id)} className="toggle-visibility">
-                                <img src={visiblePasswords[password.id] ? "show-svgrepo-com.svg" : "hide-svgrepo-com.svg"} alt={visiblePasswords[password.id] ? "Hide" : "Show"} />
-                            </button>
-                            <button onClick={() => copyToClipboard(password.password)} className="bot-button">
-                                <img src="/copy-svgrepo-com.svg" alt="Copy" />
-                            </button>
+                            <div className="button-row">
+                                <button onClick={() => togglePasswordVisibility(password.id)} className="toggle-visibility">
+                                    <img src={visiblePasswords[password.id] ? "show-svgrepo-com.svg" : "hide-svgrepo-com.svg"} alt={visiblePasswords[password.id] ? "Hide" : "Show"} />
+                                </button>
+                                <button className="bot-button">
+                                    <img src="/edit-svgrepo-com.svg" alt="Edit" />
+                                </button>
+                                <button onClick={() => copyToClipboard(password.password)} className="bot-button">
+                                    <img src="/copy-svgrepo-com.svg" alt="Copy" />
+                                </button>
+                            </div>
                         </div>
+                        <input placeholder='Enter Username to Share Password' className='input'></input>
                         <button onClick={() => sharePassword(password.details)} className="bot-button">
                             <img src="/share-1-svgrepo-com.svg" alt="Share" />
                         </button>
                     </div>
                 ))}
+            </div>
+            <div className="wrapper">
+                <div className="form">
+                    <h2 className="form-title">Add a new password</h2>
+                    <input
+                        type="text"
+                        placeholder="Service/Domain name"
+                        className="input"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        className="input"
+                    />
+                    <button className="submit">Add Password</button>
+                </div>
             </div>
         </div>
     );
