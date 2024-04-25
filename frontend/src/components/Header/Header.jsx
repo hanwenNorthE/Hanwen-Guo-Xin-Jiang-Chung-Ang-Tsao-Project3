@@ -12,8 +12,9 @@ function Header() {
             <NavLink to='/' className='logo'>Home</NavLink>
             <div className="auth-buttons">
                 <NavLink to='/pwmanager' className='link'>View Password</NavLink>
-                {!isLoginPage && <NavLink to='/login' className='link'>Log In</NavLink>}
-                {!isSignupPage && <NavLink to='/signup' className='link'>Sign Up</NavLink>}
+                <NavLink to='/' className='link'>Logout</NavLink>
+                <NavLink to='/login' className='link'>Log In</NavLink>
+                <NavLink to='/signup' className='link'>Sign Up</NavLink>
             </div>
         </div>
     );

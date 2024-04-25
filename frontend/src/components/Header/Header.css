@@ -20,8 +20,7 @@
   color: #FDF0D5;
 }
 
-.link:hover,
-.link.active {
+.link:hover {
   color: #C1121F;
   background-color: transparent;
 
