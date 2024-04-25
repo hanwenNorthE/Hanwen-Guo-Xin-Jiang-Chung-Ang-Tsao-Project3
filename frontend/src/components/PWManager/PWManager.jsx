@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axios from 'axios'
+
 import './PWManager.css';
 
 function copyToClipboard(text) {
@@ -10,6 +12,7 @@ function copyToClipboard(text) {
 }
 
 function PWManager() {
+    const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [visiblePasswords, setVisiblePasswords] = useState({});
 
@@ -17,6 +20,7 @@ function PWManager() {
         setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
+    // need change, add logic
     const passwords = [
         { id: 1, name: 'Service/Domain 1', username: 'username 1', password: 'password 1' },
         { id: 2, name: 'Service/Domain 2', username: 'username 2', password: 'password 2' },
@@ -27,6 +31,26 @@ function PWManager() {
         password.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const fuzzyMatching = async (value) => {
+        setSearchTerm(value)
+        let url = ''
+        if (value) {
+            url = `/api/passwords/search/${value}`
+        } else {
+            url = `/api/passwords`
+        }
+        try {
+            const response = await axios({
+                method: 'GET',
+                url: url
+            })
+            console.log('response', response)
+        } catch (err) {
+            console.log('err', err.response.data)
+            setError(JSON.stringify(err.response.data))
+        }
+    }
+
     return (
         <div className="pwmanager">
             <h1>View and update your passwords.</h1>
@@ -34,9 +58,10 @@ function PWManager() {
                 type="text"
                 placeholder="Search by service"
                 value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
+                onChange={e => fuzzyMatching(e.target.value)}
                 className="search-box"
             />
+            {error && <div style={{ color: 'red' }}>{error}</div>}
             <div className="cards-container">
                 {filteredPasswords.map(password => (
                     <div key={password.id} className="card">
@@ -51,7 +76,7 @@ function PWManager() {
                                 <img src="/copy-svgrepo-com.svg" alt="Copy" />
                             </button>
                         </div>
-                        <button onClick={() => sharePassword(password.details)} className="bot-button"> 
+                        <button onClick={() => sharePassword(password.details)} className="bot-button">
                             <img src="/share-1-svgrepo-com.svg" alt="Share" />
                         </button>
                     </div>
