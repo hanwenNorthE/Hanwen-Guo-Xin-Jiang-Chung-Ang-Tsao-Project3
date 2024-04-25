@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const session = require('express-session');
 // const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
+const path = require('path')
 const usersRouter = require("./db/router/userRouter.cjs");
 const passwordsRouter = require("./db/router/passwordsRouter.cjs");
 
@@ -30,6 +31,14 @@ app.use(session({
 
 app.use("/api/users", usersRouter);
 app.use("/api/passwords", passwordsRouter);
+
+let frontend_dir = path.join(__dirname, '..', 'frontend', 'dist')
+
+app.use(express.static(frontend_dir));
+app.get('*', function (req, res) {
+    console.log("received request");
+    res.sendFile(path.join(frontend_dir, "index.html"));
+});
 
 mongoose
   .connect(
