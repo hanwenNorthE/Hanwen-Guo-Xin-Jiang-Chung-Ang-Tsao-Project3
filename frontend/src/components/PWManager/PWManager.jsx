@@ -14,6 +14,14 @@ function PWManager() {
         setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Password copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+
     const passwords = [
         { id: 1, name: 'Service/Domain 1', password: 'password 1' },
         { id: 2, name: 'Service/Domain 2', password: 'password 2' },
