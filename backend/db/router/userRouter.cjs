@@ -30,8 +30,10 @@ router.get("/getUser", checkAuth,userModel.getUser);
 //router for update user login pw 
 router.put("/updatePw", checkAuth,userModel.updatePw); 
 
-//router for adding a friend in order to share passwords
-router.post("/addMutualFriendship",checkAuth, userModel.addMutualFriendship ); 
+// //router for adding a friend in order to share passwords
+// router.post("/addMutualFriendship",checkAuth, userModel.addMutualFriendship ); 
+
+// //share password
 
 //router for logout
 router.get("/logout", checkAuth,userModel.logout ); 
