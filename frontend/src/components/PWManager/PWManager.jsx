@@ -9,6 +9,8 @@ function PWManager() {
     const [visiblePasswords, setVisiblePasswords] = useState({});
     const [domain, setDomain] = useState('');
     const [password, setPassword] = useState('');
+    const [editPasswordId, setEditPasswordId] = useState(null);
+    const [editPasswordValue, setEditPasswordValue] = useState('');
 
     const togglePasswordVisibility = (id) => {
         setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
@@ -68,6 +70,28 @@ function PWManager() {
         }
     };
 
+    const handleStartEdit = (password) => {
+        setEditPasswordId(password.id);
+        setEditPasswordValue(password.password);
+    };
+
+    const handleSaveEdit = async (id, title) => {
+        try {
+            const response = await axios.patch(`/api/passwords/update/${title}`, {
+                password: editPasswordValue
+            });
+            console.log('Update password response:', response);
+            setEditPasswordId(null); // Exit edit mode
+        } catch (error) {
+            console.error('Failed to update password:', error);
+            setError(error.response.data.error || 'Failed to update password');
+        }
+    };
+
+    const handleEditInputChange = (event) => {
+        setEditPasswordValue(event.target.value);
+    };
+
     return (
         <div className="pwmanager">
             <h1>View and update your passwords.</h1>
@@ -84,14 +108,29 @@ function PWManager() {
                     <div key={password.id} className="card">
                         <h2>{password.name}</h2>
                         <div className="password-container">
-                            <p>{visiblePasswords[password.id] ? password.password : '••••••••'}</p>
+                            {editPasswordId === password.id ? (
+                                <input 
+                                    type="text" 
+                                    value={editPasswordValue} 
+                                    onChange={handleEditInputChange}
+                                    className="password-input"
+                                />
+                            ) : (
+                                <p>{visiblePasswords[password.id] ? password.password : '••••••••'}</p>
+                            )}
                             <div className="button-row">
                                 <button onClick={() => togglePasswordVisibility(password.id)} className="toggle-visibility">
-                                    <img src={visiblePasswords[password.id] ? "show-svgrepo-com.svg" : "hide-svgrepo-com.svg"} alt={visiblePasswords[password.id] ? "Hide" : "Show"} />
+                                    <img src={visiblePasswords[password.id] ? "show-svgrepo-com.svg" : "hide-svgrepo-com.svg"} alt="Show/Hide" />
                                 </button>
-                                <button className="bot-button">
-                                    <img src="/edit-svgrepo-com.svg" alt="Edit" />
-                                </button>
+                                {editPasswordId === password.id ? (
+                                    <button onClick={() => handleSaveEdit(password.id, password.name)} className="bot-button">
+                                        <img src="/save-svgrepo-com.svg" alt="Save" />
+                                    </button>
+                                ) : (
+                                    <button onClick={() => handleStartEdit(password)} className="bot-button">
+                                        <img src="/edit-svgrepo-com.svg" alt="Edit" />
+                                    </button>
+                                )}
                                 <button onClick={() => copyToClipboard(password.password)} className="bot-button">
                                     <img src="/copy-svgrepo-com.svg" alt="Copy" />
                                 </button>
