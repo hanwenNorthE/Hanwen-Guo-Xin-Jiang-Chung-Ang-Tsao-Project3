@@ -1,20 +1,35 @@
-import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import './Header.css';
 
 function Header() {
-    const location = useLocation();
-    const isLoginPage = location.pathname === '/login';
-    const isSignupPage = location.pathname === '/signup';
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const user = localStorage.getItem('user');
+        setIsLoggedIn(!!user);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        setIsLoggedIn(false);
+    };
 
     return (
         <div className='header'>
             <NavLink to='/' className='logo'>Home</NavLink>
             <div className="auth-buttons">
-                <NavLink to='/pwmanager' className='link'>View Password</NavLink>
-                <NavLink to='/' className='link'>Logout</NavLink>
-                <NavLink to='/login' className='link'>Log In</NavLink>
-                <NavLink to='/signup' className='link'>Sign Up</NavLink>
+                {isLoggedIn ? (
+                    <>
+                        <NavLink to='/pwmanager' className='link'>View Password</NavLink>
+                        <NavLink to='/' className='link' onClick={handleLogout}>Logout</NavLink>
+                    </>
+                ) : (
+                    <>
+                        <NavLink to='/login' className='link'>Log In</NavLink>
+                        <NavLink to='/signup' className='link'>Sign Up</NavLink>
+                    </>
+                )}
             </div>
         </div>
     );
