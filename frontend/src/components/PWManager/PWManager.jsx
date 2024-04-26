@@ -11,6 +11,8 @@ function PWManager() {
     const [password, setPassword] = useState('');
     const [editPasswordId, setEditPasswordId] = useState(null);
     const [editPasswordValue, setEditPasswordValue] = useState('');
+    const [enteredUsername, setEnteredUsername] = useState('');
+
 
     const togglePasswordVisibility = (id) => {
         setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
@@ -55,7 +57,7 @@ function PWManager() {
             setError(error.response.data.error || 'Failed to delete password');
         }
     };
-    
+
 
     const handleAddPassword = async (e) => {
         e.preventDefault();
@@ -81,7 +83,7 @@ function PWManager() {
                 password: editPasswordValue
             });
             console.log('Update password response:', response);
-            setEditPasswordId(null); // Exit edit mode
+            setEditPasswordId(null);
         } catch (error) {
             console.error('Failed to update password:', error);
             setError(error.response.data.error || 'Failed to update password');
@@ -91,6 +93,25 @@ function PWManager() {
     const handleEditInputChange = (event) => {
         setEditPasswordValue(event.target.value);
     };
+
+    //draft return usernames
+
+    const handleInputChange = (event) => {
+        setEnteredUsername(event.target.value);
+    };
+
+    const handleAddFriend = async () => {
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        const userA = currentUser.username;
+        const userB = enteredUsername;
+        const response = await axios.post('/api/users/addMutualFriendship', {
+            userA: { username: userA },
+            userB: { username: userB }
+        });
+        console.log(response.data.message);
+    };
+
+
 
     return (
         <div className="pwmanager">
@@ -109,9 +130,9 @@ function PWManager() {
                         <h2>{password.name}</h2>
                         <div className="password-container">
                             {editPasswordId === password.id ? (
-                                <input 
-                                    type="text" 
-                                    value={editPasswordValue} 
+                                <input
+                                    type="text"
+                                    value={editPasswordValue}
                                     onChange={handleEditInputChange}
                                     className="password-input"
                                 />
@@ -139,8 +160,13 @@ function PWManager() {
                                 </button>
                             </div>
                         </div>
-                        <input placeholder='Enter Username to Share Password' className='input'></input>
-                        <button className="bot-button">
+                        <input
+                            placeholder='Enter Username to Share Password'
+                            value={enteredUsername}
+                            onChange={handleInputChange}
+                            className='input'
+                        />
+                        <button onClick={handleAddFriend} className="bot-button">
                             <img src="/share-1-svgrepo-com.svg" alt="Share" />
                         </button>
                     </div>
