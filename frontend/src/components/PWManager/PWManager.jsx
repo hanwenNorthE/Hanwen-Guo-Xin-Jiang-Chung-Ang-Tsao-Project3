@@ -36,6 +36,17 @@ function PWManager() {
         }
     };
 
+    const handleDeletePassword = async (title) => {
+        try {
+            const response = await axios.delete(`/api/passwords/delete/${title}`);
+            console.log('Delete password response:', response.data);
+        } catch (error) {
+            console.error('Failed to delete password:', error.response.data);
+            setError(error.response.data.error || 'Failed to delete password');
+        }
+    };
+    
+
     const handleAddPassword = async (e) => {
         e.preventDefault();
         try {
@@ -76,7 +87,7 @@ function PWManager() {
                                 <button onClick={() => copyToClipboard(password.password)} className="bot-button">
                                     <img src="/copy-svgrepo-com.svg" alt="Copy" />
                                 </button>
-                                <button className="bot-button">
+                                <button onClick={() => handleDeletePassword(password.title)} className="bot-button">
                                     <img src="delete-2-svgrepo-com.svg" alt="Delete" />
                                 </button>
                             </div>
