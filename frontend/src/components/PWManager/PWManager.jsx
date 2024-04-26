@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import './PWManager.css';
@@ -7,12 +7,9 @@ function PWManager() {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [visiblePasswords, setVisiblePasswords] = useState({});
-    const [domain, setDomain] = useState('');
-    const [password, setPassword] = useState('');
     const [editPasswordId, setEditPasswordId] = useState(null);
     const [editPasswordValue, setEditPasswordValue] = useState('');
-    const [enteredUsername, setEnteredUsername] = useState('');
-
+    const [passwordsList, setPasswordsList] = useState([])
 
     const togglePasswordVisibility = (id) => {
         setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
@@ -26,25 +23,17 @@ function PWManager() {
         });
     }
 
-    const passwords = [
-        { id: 1, name: 'Service/Domain 1', password: 'password 1' },
-        { id: 2, name: 'Service/Domain 2', password: 'password 2' },
-        { id: 3, name: 'Service/Domain 3', password: 'password 3' }
-    ];
-
-    const filteredPasswords = passwords.filter(password =>
-        password.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     const fuzzyMatching = async (value) => {
         setSearchTerm(value);
         let url = value ? `/api/passwords/search/${value}` : `/api/passwords`;
         try {
             const response = await axios.get(url);
-            console.log('response', response);
+            setPasswordsList(response.data)
+            setError('');
         } catch (err) {
+            setPasswordsList([])
             console.error('err', err.response.data);
-            setError(JSON.stringify(err.response.data));
+            setError('NO Data');
         }
     };
 
@@ -52,23 +41,11 @@ function PWManager() {
         try {
             const response = await axios.delete(`/api/passwords/delete/${title}`);
             console.log('Delete password response:', response.data);
+            fuzzyMatching('')
+            setError('')
         } catch (error) {
             console.error('Failed to delete password:', error.response.data);
             setError(error.response.data.error || 'Failed to delete password');
-        }
-    };
-
-
-    const handleAddPassword = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post('/api/passwords/add', { title: domain, password });
-            console.log('Add password response:', response);
-            setDomain('');
-            setPassword('');
-        } catch (error) {
-            console.error('Failed to add password:', error);
-            setError(error.response.data.error || 'Failed to add password');
         }
     };
 
@@ -83,7 +60,8 @@ function PWManager() {
                 password: editPasswordValue
             });
             console.log('Update password response:', response);
-            setEditPasswordId(null);
+            fuzzyMatching('')
+            setEditPasswordId(null); // Exit edit mode
         } catch (error) {
             console.error('Failed to update password:', error);
             setError(error.response.data.error || 'Failed to update password');
@@ -94,24 +72,30 @@ function PWManager() {
         setEditPasswordValue(event.target.value);
     };
 
-    //draft return usernames
+    useEffect(() => {
+        fuzzyMatching('')
+    }, [])
 
-    const handleInputChange = (event) => {
-        setEnteredUsername(event.target.value);
+    const [error2, setError2] = useState('');
+    const [credentials, setCredentials] = useState({ title: '', password: '' });
+    const handleChange = (e) => {
+        setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    }
+
+    const handleAddPassword = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('/api/passwords/add', credentials);
+            console.log('Add password response:', response);
+            // alert('add success');
+            setCredentials({ title: '', password: '' });
+            setError2('');
+            fuzzyMatching('');
+        } catch (error) {
+            console.error('Failed to add password:', error);
+            setError2(error.response.data.error || 'Failed to add password');
+        }
     };
-
-    const handleAddFriend = async () => {
-        const currentUser = JSON.parse(localStorage.getItem('user'));
-        const userA = currentUser.username;
-        const userB = enteredUsername;
-        const response = await axios.post('/api/users/addMutualFriendship', {
-            userA: { username: userA },
-            userB: { username: userB }
-        });
-        console.log(response.data.message);
-    };
-
-
 
     return (
         <div className="pwmanager">
@@ -125,9 +109,9 @@ function PWManager() {
             />
             {error && <div style={{ color: 'red' }}>{error}</div>}
             <div className="cards-container">
-                {filteredPasswords.map(password => (
+                {passwordsList.map(password => (
                     <div key={password.id} className="card">
-                        <h2>{password.name}</h2>
+                        <h2>{password.title}</h2>
                         <div className="password-container">
                             {editPasswordId === password.id ? (
                                 <input
@@ -144,7 +128,7 @@ function PWManager() {
                                     <img src={visiblePasswords[password.id] ? "show-svgrepo-com.svg" : "hide-svgrepo-com.svg"} alt="Show/Hide" />
                                 </button>
                                 {editPasswordId === password.id ? (
-                                    <button onClick={() => handleSaveEdit(password.id, password.name)} className="bot-button">
+                                    <button onClick={() => handleSaveEdit(password.id, password.title)} className="bot-button">
                                         <img src="/save-svgrepo-com.svg" alt="Save" />
                                     </button>
                                 ) : (
@@ -160,39 +144,22 @@ function PWManager() {
                                 </button>
                             </div>
                         </div>
-                        <input
-                            placeholder='Enter Username to Share Password'
-                            value={enteredUsername}
-                            onChange={handleInputChange}
-                            className='input'
-                        />
-                        <button onClick={handleAddFriend} className="bot-button">
+                        <input placeholder='Enter Username to Share Password' className='input'></input>
+                        <button className="bot-button">
                             <img src="/share-1-svgrepo-com.svg" alt="Share" />
                         </button>
                     </div>
                 ))}
             </div>
+
             <div className="wrapper">
-                <form className="form" onSubmit={handleAddPassword}>
+                <div className="form">
                     <h2 className="form-title">Add a new password</h2>
-                    <input
-                        type="text"
-                        placeholder="Service/Domain name"
-                        value={domain}
-                        onChange={e => setDomain(e.target.value)}
-                        className="input"
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        className="input"
-                        required
-                    />
-                    <button type="submit" className="submit">Add Password</button>
-                </form>
+                    <input id="title" name="title" value={credentials.title} type="text" placeholder="Service/Domain name" className="input" onChange={handleChange} />
+                    <input id="password" name="password" value={credentials.password} type="password" placeholder="Password" className="input" onChange={handleChange} />
+                    {error2 && <div style={{ color: 'red' }}>{error2}</div>}
+                    <button className="button" onClick={handleAddPassword}>Add Password</button>
+                </div>
             </div>
         </div>
     );
