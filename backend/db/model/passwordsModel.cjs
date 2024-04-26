@@ -63,7 +63,6 @@ const getAllPasswords = async (req, res,next) => {
       return res.status(500).json({ error: "Password encrypted failed" });
     }
     
-  
     const newPassword = new passwordModel({
       title:title,
       password:encryptedPassword,

@@ -157,46 +157,6 @@ const getUser = async (req, res) => {
   
 
 
-//addMutualFriendship   req:{userA，userB}
-const addMutualFriendship  = async (req, res) => {
-  const { userA, userB } = req.body; 
-  usernameA = userA.username 
-  usernameB = userB.username 
-   
-  if (usernameA === usernameB){
-    return res.status(400).json({ error: 'user sumbit their own username' });
-  }
-
-  try {
-    const userB = await userModel.findOne({ username: usernameB });
-    if (!userB) {
-      return res.status(404).json({ error: 'User you enter not found' });
-    }
-    const userA = await userModel.findOne({ username: usernameA });
- 
-    console.log(userA._id);
-    console.log(userB.friends);
-    if (userB.friends.includes(userA._id)) {
-      return res.status(400).json({ error: 'User you enter is already a friend of you' });
-    }
-   
-    // B add A-id in friends
-    userB.friends.push(userA._id);
-    await userB.save();
-
-    // A add B-id in friends 
-    if (!userA.friends.includes(userB._id)) {
-      userA.friends.push(userB._id);
-      await userA.save();    
-    }
-   
-    return res.status(200).json({ message: 'Friend added successfully' });
-  } catch (error) {
-    console.error('Error adding friend:', error);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
 //logout 
 const logout = async (req, res) => {
   try {
@@ -215,7 +175,7 @@ const logout = async (req, res) => {
 module.exports = {signup
                   ,login
                   ,getUser 
-                  ,addMutualFriendship 
+                  // ,addMutualFriendship 
                   ,updatePw
                   ,logout
                   };

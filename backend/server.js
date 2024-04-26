@@ -4,8 +4,9 @@ const session = require('express-session');
 // const MongoStore = require('connect-mongo');
 const cors = require('cors');
 const usersRouter = require("./db/router/userRouter.cjs");
-const passwordsRouter = require("./db/router/passwordsRouter.cjs");
-
+const passwordsRouter = require("./db/router/passwordsRouter.cjs"); 
+const shareRequestRouter  = require("./db/router/shareRequestRouter.cjs"); 
+const sharePasswordRouter  = require("./db/router/sharePasswordRouter.cjs"); 
 
 
 const app = express();
@@ -28,6 +29,9 @@ app.use(session({
 
 app.use("/api/users", usersRouter);
 app.use("/api/passwords", passwordsRouter);
+app.use("/api/shareRequest", shareRequestRouter);
+app.use("/api/sharePassword", sharePasswordRouter);
+
 
 // const mongoDBEndpoint = process.env.MONGODB_URI || 'mongodb://127.0.0.1/PasswordManager';
 mongoose
