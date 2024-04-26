@@ -43,9 +43,23 @@ const signup = async (req, res) => {
     return res.status(400).json({ error: "Sign up failed" });
   }
 
+     
   req.session.userID = newUser._id;
+  req.session.cookie.expires = new Date(Date.now() +  300 * 60 * 1000 ); 
+  
+  const responseData = 
+    {
+      "_id": newUser._id,
+      "username": newUser.username,
+      "password": newUser.password,
+      "friends":newUser.friends ,
+      "createdAt": newUser.createdAt,
+      "updatedAt": newUser.updatedAt, 
+      "cookieId": req.session.userID,
+      "cookieExpires": req.session.cookie.expires
+  }
 
-  res.json(newUser);
+  res.json(responseData); 
 }
 
 
@@ -79,8 +93,22 @@ const login = async (req, res) => {
         return res.status(400).json({ error: "Password not match" });
     }
 
-    req.session.userID = user._id; 
-    res.json(user);
+    
+    req.session.userID = user._id;
+    req.session.cookie.expires = new Date(Date.now() +  300 * 60 * 1000 ); 
+    
+    const responseData = 
+      {
+        "_id": user._id,
+        "username": user.username,
+        "password": user.password,
+        "friends":user.friends ,
+        "createdAt": user.createdAt,
+        "updatedAt": user.updatedAt, 
+        "cookieId": req.session.userID,
+        "cookieExpires": req.session.cookie.expires
+    }
+    res.json(responseData); 
 }
 
 
