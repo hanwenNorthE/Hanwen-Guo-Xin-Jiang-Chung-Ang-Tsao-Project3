@@ -1,26 +1,19 @@
 import React, { useState } from 'react';
-import axios from 'axios'
+import axios from 'axios';
 
 import './PWManager.css';
-
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Password copied to clipboard!');
-    }).catch(err => {
-        console.error('Failed to copy: ', err);
-    });
-}
 
 function PWManager() {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [visiblePasswords, setVisiblePasswords] = useState({});
+    const [domain, setDomain] = useState('');
+    const [password, setPassword] = useState('');
 
     const togglePasswordVisibility = (id) => {
         setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    // need change, add logic
     const passwords = [
         { id: 1, name: 'Service/Domain 1', password: 'password 1' },
         { id: 2, name: 'Service/Domain 2', password: 'password 2' },
@@ -32,24 +25,29 @@ function PWManager() {
     );
 
     const fuzzyMatching = async (value) => {
-        setSearchTerm(value)
-        let url = ''
-        if (value) {
-            url = `/api/passwords/search/${value}`
-        } else {
-            url = `/api/passwords`
-        }
+        setSearchTerm(value);
+        let url = value ? `/api/passwords/search/${value}` : `/api/passwords`;
         try {
-            const response = await axios({
-                method: 'GET',
-                url: url
-            })
-            console.log('response', response)
+            const response = await axios.get(url);
+            console.log('response', response);
         } catch (err) {
-            console.log('err', err.response.data)
-            setError(JSON.stringify(err.response.data))
+            console.error('err', err.response.data);
+            setError(JSON.stringify(err.response.data));
         }
-    }
+    };
+
+    const handleAddPassword = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('/api/passwords/add', { title: domain, password });
+            console.log('Add password response:', response);
+            setDomain('');
+            setPassword('');
+        } catch (error) {
+            console.error('Failed to add password:', error);
+            setError(error.response.data.error || 'Failed to add password');
+        }
+    };
 
     return (
         <div className="pwmanager">
@@ -78,30 +76,39 @@ function PWManager() {
                                 <button onClick={() => copyToClipboard(password.password)} className="bot-button">
                                     <img src="/copy-svgrepo-com.svg" alt="Copy" />
                                 </button>
+                                <button className="bot-button">
+                                    <img src="delete-2-svgrepo-com.svg" alt="Delete" />
+                                </button>
                             </div>
                         </div>
                         <input placeholder='Enter Username to Share Password' className='input'></input>
-                        <button onClick={() => sharePassword(password.details)} className="bot-button">
+                        <button className="bot-button">
                             <img src="/share-1-svgrepo-com.svg" alt="Share" />
                         </button>
                     </div>
                 ))}
             </div>
             <div className="wrapper">
-                <div className="form">
+                <form className="form" onSubmit={handleAddPassword}>
                     <h2 className="form-title">Add a new password</h2>
                     <input
                         type="text"
                         placeholder="Service/Domain name"
+                        value={domain}
+                        onChange={e => setDomain(e.target.value)}
                         className="input"
+                        required
                     />
                     <input
                         type="password"
                         placeholder="Password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
                         className="input"
+                        required
                     />
-                    <button className="submit">Add Password</button>
-                </div>
+                    <button type="submit" className="submit">Add Password</button>
+                </form>
             </div>
         </div>
     );
