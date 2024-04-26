@@ -6,7 +6,7 @@ import Login from './components/Login/Login';
 import Signup from './components/Signup/Signup';
 import Layout from './components/Layout/Layout';
 import PWManager from './components/PWManager/PWManager';
-
+import { Toaster } from 'react-hot-toast';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Router>
@@ -19,5 +19,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </Routes>
       </Layout>
     </Router>
+    <Toaster />
   </React.StrictMode>,
 );

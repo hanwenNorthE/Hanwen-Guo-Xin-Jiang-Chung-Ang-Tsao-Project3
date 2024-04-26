@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import toast from 'react-hot-toast';
 import './PWManager.css';
 
 function PWManager() {
@@ -17,7 +17,7 @@ function PWManager() {
 
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
-            alert('Password copied to clipboard!');
+            toast.success('Password copied to clipboard!');
         }).catch(err => {
             console.error('Failed to copy: ', err);
         });
@@ -41,6 +41,7 @@ function PWManager() {
         try {
             const response = await axios.delete(`/api/passwords/delete/${title}`);
             console.log('Delete password response:', response.data);
+            toast.success('delete success');
             fuzzyMatching('')
             setError('')
         } catch (error) {
@@ -60,6 +61,7 @@ function PWManager() {
                 password: editPasswordValue
             });
             console.log('Update password response:', response);
+            toast.success('edit success');
             fuzzyMatching('')
             setEditPasswordId(null); // Exit edit mode
         } catch (error) {
@@ -87,7 +89,7 @@ function PWManager() {
         try {
             const response = await axios.post('/api/passwords/add', credentials);
             console.log('Add password response:', response);
-            // alert('add success');
+            toast.success('add success');
             setCredentials({ title: '', password: '' });
             setError2('');
             fuzzyMatching('');

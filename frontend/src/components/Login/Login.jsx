@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import toast from 'react-hot-toast';
+
 import './Login.css';
 import axios from 'axios';
 
@@ -19,9 +21,11 @@ function Login() {
         data: credentials
       });
 
-      localStorage.setItem('user', JSON.stringify(response.data)); 
-      alert('login success');
-      window.location.href = '/pwmanager'; 
+      localStorage.setItem('user', JSON.stringify(response.data));
+      toast.success('login success');
+      setTimeout(() => {
+        window.location.href = '/pwmanager';
+      }, 500)
     } catch (err) {
       console.log('error', err.response ? err.response.data : err.message);
       setError(err.response ? JSON.stringify(err.response.data) : "Login failed!");

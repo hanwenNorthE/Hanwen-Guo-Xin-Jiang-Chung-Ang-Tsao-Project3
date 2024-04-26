@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import './Signup.css';
 import axios from 'axios'
 
@@ -17,15 +18,13 @@ function Signup() {
                 url: '/api/users/signup',
                 data: credentials
             })
-            console.log('response', response)
-            console.log('response', response.data)
-
             // localStorage.setItem('token', response.data.token);
-            alert('sign up success')
-            window.location.href = '/login'
+            toast.success('sign up success');
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 500)
         } catch (err) {
-            console.log('err', err.response.data)
-            setError(JSON.stringify(err.response.data))
+            setError(err.response ? JSON.stringify(err.response.data) : "Sign Up failed!");
         }
     }
 
