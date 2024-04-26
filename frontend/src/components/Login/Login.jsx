@@ -12,17 +12,12 @@ function Login() {
   };
 
   const handleLogin = async () => {
-    console.log(111);
-    console.log(credentials);
-
     try {
       const response = await axios({
         method: 'POST',
         url: '/api/users/login',
         data: credentials
       });
-      console.log('response', response);
-      console.log('response', response.data);
 
       localStorage.setItem('user', JSON.stringify(response.data)); 
       alert('login success');

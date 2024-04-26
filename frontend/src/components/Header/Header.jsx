@@ -4,15 +4,21 @@ import './Header.css';
 
 function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userName, setUserName] = useState('');
 
     useEffect(() => {
         const user = localStorage.getItem('user');
-        setIsLoggedIn(!!user);
+        if (user) {
+            const userData = JSON.parse(user);
+            setIsLoggedIn(true);
+            setUserName(userData.username);
+        }
     }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('user');
         setIsLoggedIn(false);
+        setUserName('');
     };
 
     return (
@@ -21,6 +27,7 @@ function Header() {
             <div className="auth-buttons">
                 {isLoggedIn ? (
                     <>
+                        <NavLink to='/' className='link'>Welcome back, {userName} </NavLink>
                         <NavLink to='/pwmanager' className='link'>View Password</NavLink>
                         <NavLink to='/' className='link' onClick={handleLogout}>Logout</NavLink>
                     </>
