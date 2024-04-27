@@ -4,7 +4,7 @@ Group: Steven Jiang, Chung-ang Tsao, Hanwen Guo
 
 # How to use this password manager?
 Please go to https://hermann-guo-passwordmanager.onrender.com/pwmanager,
-You can either sign up for a new user account, or use our test account (username:aaa, password: 123456)
+You can either sign up for a new user account, or use our test account (username:test01, password: 123456)
 Sometime the Render.com may get slower since we are using the free account, please reload, logout and re-sign in to your testing account.
 
 # Write Up

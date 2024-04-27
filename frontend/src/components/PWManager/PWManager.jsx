@@ -9,7 +9,8 @@ function PWManager() {
     const [visiblePasswords, setVisiblePasswords] = useState({});
     const [editPasswordId, setEditPasswordId] = useState(null);
     const [editPasswordValue, setEditPasswordValue] = useState('');
-    const [passwordsList, setPasswordsList] = useState([])
+    const [passwordsList, setPasswordsList] = useState([]);
+    const [shareUsernameList, setShareUsernameList] = useState([]);
 
     const togglePasswordVisibility = (id) => {
         setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
@@ -28,6 +29,7 @@ function PWManager() {
         let url = value ? `/api/passwords/search/${value}` : `/api/passwords`;
         try {
             const response = await axios.get(url);
+            setShareUsernameList(new Array(response.data.length).fill(''))
             setPasswordsList(response.data)
             setError('');
         } catch (err) {
@@ -99,6 +101,21 @@ function PWManager() {
         }
     };
 
+    const handleSharePassword = async (passwordId, shareUsername) => {
+        try {
+            const response = await axios.post('/api/shareRequest/createRequest', {
+                passwordId: passwordId,
+                shareUser: shareUsername
+            });
+            console.log('Share password response:', response.data);
+            toast.success('Share request sent successfully!');
+        } catch (error) {
+            console.log('error', error)
+            const errMsg = error.response.data.error || error.response.data
+            toast.error(errMsg || 'Share request sent successfully!');
+        }
+    };
+
     return (
         <div className="pwmanager">
             <h1>View and update your passwords.</h1>
@@ -111,7 +128,7 @@ function PWManager() {
             />
             {error && <div style={{ color: 'red' }}>{error}</div>}
             <div className="cards-container">
-                {passwordsList.map(password => (
+                {passwordsList.map((password, index) => (
                     <div key={password.id} className="card">
                         <h2>{password.title}</h2>
                         <div className="password-container">
@@ -146,8 +163,13 @@ function PWManager() {
                                 </button>
                             </div>
                         </div>
-                        <input placeholder='Enter Username to Share Password' className='input'></input>
-                        <button className="bot-button">
+                        <input
+                            placeholder='Enter Username to Share Password'
+                            className='input'
+                            value={shareUsernameList[index]}
+                            onChange={(e) => setShareUsernameList(prevValues => prevValues.map((val, i) => i === index ? e.target.value : val))}
+                        />
+                        <button onClick={() => handleSharePassword(password.id, shareUsernameList[index])} className="bot-button">
                             <img src="/share-1-svgrepo-com.svg" alt="Share" />
                         </button>
                     </div>
