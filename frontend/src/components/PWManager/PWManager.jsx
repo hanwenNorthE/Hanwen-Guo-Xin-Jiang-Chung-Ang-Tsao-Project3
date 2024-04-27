@@ -10,10 +10,78 @@ function PWManager() {
     const [editPasswordId, setEditPasswordId] = useState(null);
     const [editPasswordValue, setEditPasswordValue] = useState('');
     const [passwordsList, setPasswordsList] = useState([])
+    const [usernameToShare, setUsernameToShare] = useState('');
+    const user = JSON.parse(localStorage.getItem('user')); // Retrieve and parse the user data
+
+
+    const [pendingRequests, setPendingRequests] = useState([]);
+
+    const [sharedPasswords, setSharedPasswords] = useState([]);
+
+
+    const fetchSharedPasswords = async () => {
+        try {
+            const response = await axios.get('/api/sharePassword/'); // Endpoint to get shared passwords
+            setSharedPasswords(response.data);
+        } catch (error) {
+            console.error("No shared pw or Error fetching shared passwords");
+        }
+    };
+    useEffect(() => {
+        fetchSharedPasswords().then(() => {
+        });
+    }, []);
+    useEffect(() => {
+        fetchSharedPasswords();
+    }, []);
+
+    const fetchPendingRequests = async () => {
+        try {
+            const response = await axios.get('/api/shareRequest/getRequest');
+            setPendingRequests(response.data);
+            console.log("fetched requests");
+        } catch (error) {
+            console.error("No requests or Error fetching requests");
+        }
+    };
+
+    useEffect(() => {
+        fetchPendingRequests();
+    }, []);
+
+    const handleAcceptRequest = async (userRequestId) => {
+        try {
+            const response = await axios.put(`/api/shareRequest/updateRequest/accepted`, {
+                userRequest: userRequestId
+            });
+            toast.success('Request accepted successfully');
+            // Filter out the accepted request from the state
+            setPendingRequests(prevRequests => prevRequests.filter(request => request.fromUser !== userRequestId));
+        } catch (error) {
+            toast.error("Failed to accept request: " + (error.response ? error.response.data.error : "Unknown Error"));
+        }
+    };
+
+    const handleDeclineRequest = async (userRequestId) => {
+        try {
+            const response = await axios.put(`/api/shareRequest/updateRequest/rejected`, {
+                userRequest: userRequestId
+            });
+            toast.success('Request declined successfully');
+            setPendingRequests(prevRequests => prevRequests.filter(request => request.fromUser !== userRequestId));
+        } catch (error) {
+            toast.error("Failed to decline request: " + (error.response ? error.response.data.error : "Unknown Error"));
+        }
+    };
+
 
     const togglePasswordVisibility = (id) => {
-        setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
+        setVisiblePasswords(prevVisiblePasswords => ({
+            ...prevVisiblePasswords,
+            [id]: !prevVisiblePasswords[id]
+        }));
     };
+
 
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
@@ -99,6 +167,40 @@ function PWManager() {
         }
     };
 
+
+
+    const handleShareChange = (e) => {
+        setUsernameToShare(e.target.value);
+    };
+
+    const handleShareRequest = async () => {
+        console.log("Current user's username:", user ? user.username : "No user found");
+
+        if (!usernameToShare) {
+            toast.error("Please enter a username.");
+            return;
+        }
+        if (!user) {
+            toast.error("Session not found. Please login again.");
+            return;
+        }
+
+        try {
+            console.log("Sending request for", usernameToShare, "from", user.username);
+            const response = await axios.post('/api/shareRequest/createRequest', {
+                shareUser: usernameToShare,
+                requestingUser: user.username // Optional, for reference or other use
+            });
+            console.log("Request sent successfully", response.data);
+            toast.success('Request sent successfully');
+            setUsernameToShare('');
+        } catch (error) {
+            console.error("Error sending request:", error.response ? error.response.data : error.message);
+            toast.error(error.response ? error.response.data.error : "Failed to send request");
+        }
+    };
+
+
     return (
         <div className="pwmanager">
             <h1>View and update your passwords.</h1>
@@ -110,6 +212,20 @@ function PWManager() {
                 className="search-box"
             />
             {error && <div style={{ color: 'red' }}>{error}</div>}
+            <div>
+                {pendingRequests.length > 0 ? (
+                    pendingRequests.map(request => (
+                        <div key={request.id}>
+                            <p>{request.fromUsername} wants to share a password with you.</p>
+                            <button onClick={() => handleAcceptRequest(request.fromUser)}>Accept</button>
+                            <button onClick={() => handleDeclineRequest(request.fromUser)}>Decline</button>
+                        </div>
+                    ))
+                ) : (
+                    <p>No pending requests.</p>
+                )}
+            </div>
+
             <div className="cards-container">
                 {passwordsList.map(password => (
                     <div key={password.id} className="card">
@@ -123,7 +239,7 @@ function PWManager() {
                                     className="password-input"
                                 />
                             ) : (
-                                <p>{visiblePasswords[password.id] ? password.password : '••••••••'}</p>
+                                <p>{visiblePasswords[password.id] ? password.password : '••••••••••'}</p>
                             )}
                             <div className="button-row">
                                 <button onClick={() => togglePasswordVisibility(password.id)} className="toggle-visibility">
@@ -146,13 +262,62 @@ function PWManager() {
                                 </button>
                             </div>
                         </div>
-                        <input placeholder='Enter Username to Share Password' className='input'></input>
-                        <button className="bot-button">
+                        <input
+                            value={usernameToShare}
+                            onChange={handleShareChange}
+                            placeholder='Enter Username to Share Password'
+                            className='input'
+                        />
+                        <button onClick={handleShareRequest} className="bot-button">
                             <img src="/share-1-svgrepo-com.svg" alt="Share" />
                         </button>
                     </div>
                 ))}
             </div>
+            <div className="cards-container">
+                {sharedPasswords.map((passwordData) => (
+                    passwordData.sharePasswords.map((password, index) => (
+                        <div key={password._id || `${passwordData._id}-${index}`} className="card">
+                            <div className="shared-by-info">Shared Password</div>
+                            <h2>{password.title}</h2>
+                            <div className="password-container">
+                                <p>{visiblePasswords[password._id] ? password.password : '••••••••••'}</p>
+                                <div className="button-row">
+                                    <button onClick={() => togglePasswordVisibility(password._id)} className="toggle-visibility">
+                                        <img src={visiblePasswords[password._id] ? "show-svgrepo-com.svg" : "hide-svgrepo-com.svg"} alt="Show/Hide" />
+                                    </button>
+                                    <button onClick={() => copyToClipboard(password.password)} className="bot-button">
+                                        <img src="/copy-svgrepo-com.svg" alt="Copy" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ))}
+            </div>
+
+
+
+
+            {/* <div className="cards-container">
+                {sharedPasswords.map(password => (
+                    <div key={password.id} className="card">
+                        <h2>{password.title}</h2>
+                        <div className="password-container">
+                            <p>{visiblePasswords[password.id] ? password.password : '••••••••••'}</p>
+                            <div className="button-row">
+                                <button onClick={() => togglePasswordVisibility(password.id)} className="toggle-visibility">
+                                    <img src={visiblePasswords[password.id] ? "show-svgrepo-com.svg" : "hide-svgrepo-com.svg"} alt="Show/Hide" />
+                                </button>
+                                <button onClick={() => copyToClipboard(password.password)} className="bot-button">
+                                    <img src="/copy-svgrepo-com.svg" alt="Copy" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div> */}
+
 
             <div className="wrapper">
                 <div className="form">
