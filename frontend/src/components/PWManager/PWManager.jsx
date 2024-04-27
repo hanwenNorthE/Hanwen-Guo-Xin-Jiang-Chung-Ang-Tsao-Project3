@@ -9,7 +9,10 @@ function PWManager() {
     const [visiblePasswords, setVisiblePasswords] = useState({});
     const [editPasswordId, setEditPasswordId] = useState(null);
     const [editPasswordValue, setEditPasswordValue] = useState('');
-    const [passwordsList, setPasswordsList] = useState([])
+    const [passwordsList, setPasswordsList] = useState([]);
+    const [shareUsername, setShareUsername] = useState('');
+    const [shareFeedback, setShareFeedback] = useState('');
+
 
     const togglePasswordVisibility = (id) => {
         setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] }));
@@ -99,6 +102,22 @@ function PWManager() {
         }
     };
 
+    const handleSharePassword = async (passwordId, shareUsername) => {
+        try {
+            const response = await axios.post('/api/sharePasswords/createRequest', {
+                passwordId: passwordId,
+                username: shareUsername
+            });
+            console.log('Share password response:', response.data);
+            toast.success('Share request sent successfully!');
+            setShareFeedback('');
+        } catch (error) {
+            console.error('Failed to share password:', error);
+            setShareFeedback(error.response.data.error || 'Failed to share password');
+        }
+    };
+
+
     return (
         <div className="pwmanager">
             <h1>View and update your passwords.</h1>
@@ -146,8 +165,12 @@ function PWManager() {
                                 </button>
                             </div>
                         </div>
-                        <input placeholder='Enter Username to Share Password' className='input'></input>
-                        <button className="bot-button">
+                        <input placeholder='Enter Username to Share Password' 
+                                className='input'
+                                value={shareUsername}
+                                onChange={e => setShareUsername(e.target.value)}
+                        />
+                        <button onClick={() => handleSharePassword(password.id, shareUsername)} className="bot-button">
                             <img src="/share-1-svgrepo-com.svg" alt="Share" />
                         </button>
                     </div>
