@@ -278,8 +278,8 @@ function PWManager() {
                 {sharedPasswords.map((passwordData) => (
                     passwordData.sharePasswords.map((password, index) => (
                         <div key={password._id || `${passwordData._id}-${index}`} className="card">
-                            <div className="shared-by-info">Shared Password</div>
                             <h2>{password.title}</h2>
+                            <p>Shared by {password.username}</p> {/* Display the username here */}
                             <div className="password-container">
                                 <p>{visiblePasswords[password._id] ? password.password : '••••••••••'}</p>
                                 <div className="button-row">
@@ -295,29 +295,6 @@ function PWManager() {
                     ))
                 ))}
             </div>
-
-
-
-
-            {/* <div className="cards-container">
-                {sharedPasswords.map(password => (
-                    <div key={password.id} className="card">
-                        <h2>{password.title}</h2>
-                        <div className="password-container">
-                            <p>{visiblePasswords[password.id] ? password.password : '••••••••••'}</p>
-                            <div className="button-row">
-                                <button onClick={() => togglePasswordVisibility(password.id)} className="toggle-visibility">
-                                    <img src={visiblePasswords[password.id] ? "show-svgrepo-com.svg" : "hide-svgrepo-com.svg"} alt="Show/Hide" />
-                                </button>
-                                <button onClick={() => copyToClipboard(password.password)} className="bot-button">
-                                    <img src="/copy-svgrepo-com.svg" alt="Copy" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div> */}
-
 
             <div className="wrapper">
                 <div className="form">
