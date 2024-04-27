@@ -1,0 +1,47 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: transparent;
+  text-align: center;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #780000;
+  margin-right: auto;
+}
+
+.link {
+  margin: 0;
+  padding: 10px;
+  color: #FDF0D5;
+}
+
+.link:hover {
+  color: #C1121F;
+  background-color: transparent;
+
+}
+
+.auth-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+.auth-buttons a {
+  background-color: transparent;
+  color: #FDF0D5;
+  padding: 1px 5px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.auth-buttons a:hover {
+  color: #C1121F;
+
+}

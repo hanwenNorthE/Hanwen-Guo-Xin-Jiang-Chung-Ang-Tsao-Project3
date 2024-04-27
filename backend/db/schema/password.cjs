@@ -11,6 +11,7 @@ const passwordSchema = new Schema(
       type: String,
       required: true,
     },
+  
     creator: {
       type: mongoose.Types.ObjectId,
       required: true,
