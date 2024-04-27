@@ -3,7 +3,7 @@ CS5610 Project3
 Group: Steven Jiang, Chung-ang Tsao, Hanwen Guo
 
 # How to use this password manager?
-Please go to https://hermann-guo-passwordmanager.onrender.com/pwmanager.[Render deploy with release-BE-FE branch] We suggest using an incognito broswer or clear the cache before use. 
+Please go to https://hermann-guo-passwordmanager.onrender.com/pwmanager. [Render deploy with release-BE-FE branch] We suggest using an incognito broswer or clear the cache before use. 
 You can either sign up for a new user account, or use our test account (username:test01, password: 123456)
 Sometime the Render.com may get slower or lead to some unusual behavior like database not respond, since we are using the free Render and MongoDB account, please reload, logout and re-sign in to your testing account.
 
